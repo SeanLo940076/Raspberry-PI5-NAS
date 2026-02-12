@@ -54,20 +54,31 @@ If you encounter any issues or have suggestions (usage / design / code improveme
 
 ## Installation / Usage Example
 
-### 1) Update System and Enable PCIe Gen 3
+### 1) Update System and Set PCIe to Gen 2
 
-1. Enable **PCIe Gen 3** using `sudo raspi-config` (common path: Advanced Options → PCIe Speed → Gen 3):
+1. Set **PCIe Gen 2** using `sudo raspi-config` (common path: Advanced Options → PCIe Speed → Gen 2):
    ```bash
    sudo raspi-config
    ```
 
-2. Update system packages:
+2. Or configure it directly via CLI (`/boot/firmware/config.txt`):
+   ```bash
+   sudo cp /boot/firmware/config.txt /boot/firmware/config.txt.bak
+   if grep -q '^dtparam=pciex1_gen=' /boot/firmware/config.txt; then
+     sudo sed -i 's/^dtparam=pciex1_gen=.*/dtparam=pciex1_gen=2/' /boot/firmware/config.txt
+   else
+     echo 'dtparam=pciex1_gen=2' | sudo tee -a /boot/firmware/config.txt
+   fi
+   sudo reboot
+   ```
+
+3. Update system packages:
    ```bash
    sudo apt-get update
    sudo apt-get upgrade -y
    ```
 
-> Note: If you encounter PCIe link instability or SSD disconnects, try switching back to Gen 2 to confirm stability.
+> Note: Gen 2 is usually more stable; if you need higher bandwidth, you can switch to Gen 3 and test stability.
 
 **Reference screenshots (PCIe Speed):**
 

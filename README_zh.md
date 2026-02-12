@@ -54,20 +54,31 @@
 
 ## 安裝 / 使用範例
 
-### 1) 更新系統並啟用 PCIe Gen 3
+### 1) 更新系統並設定 PCIe 為 Gen 2
 
-1. 透過 `sudo raspi-config` 啟用 **PCIe Gen 3**（常見路徑：Advanced Options → PCIe Speed → Gen 3）：
+1. 透過 `sudo raspi-config` 設定 **PCIe Gen 2**（常見路徑：Advanced Options → PCIe Speed → Gen 2）：
    ```bash
    sudo raspi-config
    ```
 
-2. 更新系統套件：
+2. 或透過 CLI 指令直接設定（`/boot/firmware/config.txt`）：
+   ```bash
+   sudo cp /boot/firmware/config.txt /boot/firmware/config.txt.bak
+   if grep -q '^dtparam=pciex1_gen=' /boot/firmware/config.txt; then
+     sudo sed -i 's/^dtparam=pciex1_gen=.*/dtparam=pciex1_gen=2/' /boot/firmware/config.txt
+   else
+     echo 'dtparam=pciex1_gen=2' | sudo tee -a /boot/firmware/config.txt
+   fi
+   sudo reboot
+   ```
+
+3. 更新系統套件：
    ```bash
    sudo apt-get update
    sudo apt-get upgrade -y
    ```
 
-> 註：若遇到 PCIe 連線不穩或 SSD 斷線等狀況，可先改回 Gen 2 以確認穩定性。
+> 註：Gen 2 通常較穩定；若你要追求較高頻寬，可再視情況改為 Gen 3 進行測試。
 
 **設定示意圖（PCIe Speed）：**
 
